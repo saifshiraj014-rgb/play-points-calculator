@@ -27,12 +27,16 @@
     .footer {
       margin-top: 20px;
       text-align: center;
-      font-size: 14px;
-      color: #ffdd57;
+      font-size: 15px;
+      color: #333;
+      font-style: italic;
     }
     .footer span {
-      color: #ff4d6d;
+      color: #e63946;
       font-weight: bold;
+    }
+    .footer strong {
+      color: #1d3557;
     }
   </style>
 </head>
@@ -51,19 +55,19 @@
 
     <div id="results" class="mt-4" style="text-align:left;">
       <div class="alert alert-secondary">
-        <strong style="color:#a16207;">🟤 Bronze</strong> এ যেতে লাগবে <span id="bronzeResult">0</span> মাস
+        <strong style="color:#a16207;">🟤 Bronze</strong> এ যেতে লাগবে <span id="bronzeResult">0</span>
       </div>
       <div class="alert alert-light">
-        <strong style="color:#6b7280;">⚪ Silver</strong> এ যেতে লাগবে <span id="silverResult">0</span> মাস
+        <strong style="color:#6b7280;">⚪ Silver</strong> এ যেতে লাগবে <span id="silverResult">0</span>
       </div>
       <div class="alert alert-warning">
-        <strong style="color:#ca8a04;">🟡 Gold</strong> এ যেতে লাগবে <span id="goldResult">0</span> মাস
+        <strong style="color:#ca8a04;">🟡 Gold</strong> এ যেতে লাগবে <span id="goldResult">0</span>
       </div>
       <div class="alert alert-secondary">
-        <strong style="color:#9ca3af;">⚪ Platinum</strong> এ যেতে লাগবে <span id="platinumResult">0</span> মাস
+        <strong style="color:#9ca3af;">⚪ Platinum</strong> এ যেতে লাগবে <span id="platinumResult">0</span>
       </div>
       <div class="alert alert-info">
-        <strong style="color:#06b6d4;">🔷 Diamond</strong> এ যেতে লাগবে <span id="diamondResult">0</span> মাস
+        <strong style="color:#06b6d4;">🔷 Diamond</strong> এ যেতে লাগবে <span id="diamondResult">0</span>
       </div>
     </div>
   </div>
@@ -73,36 +77,51 @@
   </div>
 
   <script>
+    // ইংরেজি সংখ্যা → বাংলা সংখ্যা কনভার্ট
+    function toBanglaNumber(num) {
+      const engToBan = {0:"০",1:"১",2:"২",3:"৩",4:"৪",5:"৫",6:"৬",7:"৭",8:"৮",9:"৯"};
+      return num.toString().split("").map(d => engToBan[d] || d).join("");
+    }
+
+    function formatTime(months) {
+      if (months === 0) return "০ মাস";
+
+      // যদি ১২ মাস বা তার বেশি হয় → "১ বছর+"
+      if (months >= 12) {
+        return "১ বছর+";
+      }
+
+      // দিন বের করা (যদি ভগ্নাংশ থাকে)
+      const fullMonths = Math.floor(months); // পুরো মাস
+      const days = Math.round((months - fullMonths) * 30); // বাকি অংশ দিন হিসেবে
+
+      let result = "";
+      if (fullMonths > 0) result += toBanglaNumber(fullMonths) + " মাস ";
+      if (days > 0) result += toBanglaNumber(days) + " দিন";
+
+      return result.trim();
+    }
+
     function calculate() {
       const current = parseInt(document.getElementById("currentPoints").value) || 0;
-      const perMonth = parseInt(document.getElementById("monthlyPoints").value) || 1;
+      const perMonth = parseFloat(document.getElementById("monthlyPoints").value) || 1;
 
       // Thresholds
       const bronze = 150;
       const silver = 600;
       const gold = 3000;
       const platinum = 10000;
-      const diamond = 20000; // ধরে নিলাম Diamond সর্বশেষ লেভেল
+      const diamond = 20000;
 
-      // Bronze
-      document.getElementById("bronzeResult").innerText =
-        current < bronze ? Math.ceil((bronze - current) / perMonth) : 0;
+      function getMonths(target) {
+        return current < target ? (target - current) / perMonth : 0;
+      }
 
-      // Silver
-      document.getElementById("silverResult").innerText =
-        current < silver ? Math.ceil((silver - current) / perMonth) : 0;
-
-      // Gold
-      document.getElementById("goldResult").innerText =
-        current < gold ? Math.ceil((gold - current) / perMonth) : 0;
-
-      // Platinum
-      document.getElementById("platinumResult").innerText =
-        current < platinum ? Math.ceil((platinum - current) / perMonth) : 0;
-
-      // Diamond
-      document.getElementById("diamondResult").innerText =
-        current < diamond ? Math.ceil((diamond - current) / perMonth) : 0;
+      document.getElementById("bronzeResult").innerText   = formatTime(getMonths(bronze));
+      document.getElementById("silverResult").innerText   = formatTime(getMonths(silver));
+      document.getElementById("goldResult").innerText     = formatTime(getMonths(gold));
+      document.getElementById("platinumResult").innerText = formatTime(getMonths(platinum));
+      document.getElementById("diamondResult").innerText  = formatTime(getMonths(diamond));
     }
   </script>
 </body>
