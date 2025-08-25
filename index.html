@@ -1,0 +1,78 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Play Points Level ETA Calculator</title>
+  <style>
+    body { background:#111; color:#eee; font-family:Arial, sans-serif; margin:0; padding:20px; }
+    h1 { text-align:center; margin-bottom:10px; }
+    .card { background:#222; border-radius:16px; padding:20px; margin:15px 0; box-shadow:0 4px 10px rgba(0,0,0,0.5); }
+    label { display:block; margin-bottom:6px; font-size:14px; }
+    input[type=number] { width:100%; margin:6px 0; padding:8px; border-radius:8px; border:none; }
+    table { width:100%; border-collapse:separate; border-spacing:0 6px; }
+    th, td { padding:8px; text-align:left; }
+    tr { background:#333; border-radius:8px; }
+    tr td:first-child { border-top-left-radius:8px; border-bottom-left-radius:8px; }
+    tr td:last-child { border-top-right-radius:8px; border-bottom-right-radius:8px; }
+    .result { font-size:16px; font-weight:bold; text-align:right; }
+  </style>
+</head>
+<body>
+  <h1>Play Points Level ETA Calculator</h1>
+  <p style="text-align:center; color:#aaa;">Estimate how long it takes to reach Silver, Gold, Platinum, or Diamond — using only app install/try offers.</p>  <div class="card">
+    <label>Your current Play Points:</label>
+    <input type="number" id="current" value="0" min="0" max="10000" />
+  </div>  <div class="card">
+    <label>Average points you earn per month from app install/try offers:</label>
+    <input type="number" id="monthly" value="30" min="1" max="300" />
+    <small style="color:#888;">ℹ️ সাধারণত অ্যাপ অফার থেকে মাসে ২০–৫০ পয়েন্ট পাওয়া যায় (কম হলে ২০, বেশি হলে ৮০+)</small>
+  </div>  <div class="card">
+    <h3>Estimated Time to Reach Levels</h3>
+    <table>
+      <thead>
+        <tr style="color:#aaa;">
+          <th>Level</th>
+          <th>Target Points</th>
+          <th>Months Needed</th>
+          <th>ETA</th>
+        </tr>
+      </thead>
+      <tbody id="levels"></tbody>
+    </table>
+  </div>  <script>
+    const LEVELS = [
+      { name: 'Silver', target: 150 },
+      { name: 'Gold', target: 600 },
+      { name: 'Platinum', target: 3000 },
+      { name: 'Diamond', target: 10000 }
+    ];
+
+    function calculate() {
+      const current = parseInt(document.getElementById('current').value) || 0;
+      const monthly = parseInt(document.getElementById('monthly').value) || 1;
+      const tbody = document.getElementById('levels');
+      tbody.innerHTML = '';
+
+      LEVELS.forEach(level => {
+        if (current >= level.target) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${level.name}</td><td>${level.target}</td><td>✅ Already Reached</td><td>—</td>`;
+          tbody.appendChild(tr);
+        } else {
+          const remaining = level.target - current;
+          const months = Math.ceil(remaining / monthly);
+          const date = new Date();
+          date.setMonth(date.getMonth() + months);
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${level.name}</td><td>${level.target}</td><td>${months}</td><td>${date.toLocaleDateString()}</td>`;
+          tbody.appendChild(tr);
+        }
+      });
+    }
+
+    document.getElementById('current').addEventListener('input', calculate);
+    document.getElementById('monthly').addEventListener('input', calculate);
+    
+    calculate();
+  </script></body>
+</html>
