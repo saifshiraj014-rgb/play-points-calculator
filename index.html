@@ -4,97 +4,106 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Play Points Calculator</title>
-  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      background: linear-gradient(to right, #667eea, #764ba2);
-      color: #fff;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-family: "Segoe UI", sans-serif;
+      flex-direction: column;
     }
-    .card {
+    .calculator-box {
+      background: white;
+      padding: 30px;
       border-radius: 20px;
-      box-shadow: 0px 8px 20px rgba(0,0,0,0.3);
+      box-shadow: 0px 4px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
     }
-    .level {
+    .footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: #ffdd57;
+    }
+    .footer span {
+      color: #ff4d6d;
       font-weight: bold;
-      font-size: 1.2rem;
     }
-    .silver { color: #c0c0c0; }
-    .gold { color: #ffd700; }
-    .platinum { color: #e5e4e2; }
-    .diamond { color: #00ffff; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="card p-4 text-dark">
-      <h2 class="text-center mb-4">🎯 Play Points Calculator</h2>
+  <div class="calculator-box">
+    <h3 class="mb-3">🎯 Play Points Calculator</h3>
+    <div class="mb-3 text-start">
+      <label class="form-label">আপনার বর্তমান পয়েন্ট</label>
+      <input type="number" id="currentPoints" class="form-control" placeholder="যেমন: 500">
+    </div>
+    <div class="mb-3 text-start">
+      <label class="form-label">মাসে গড়ে কত পয়েন্ট পান</label>
+      <input type="number" id="monthlyPoints" class="form-control" placeholder="যেমন: 200">
+    </div>
+    <button class="btn btn-primary w-100" onclick="calculate()">ক্যালকুলেট করুন</button>
 
-      <div class="mb-3">
-        <label for="current" class="form-label">আপনার বর্তমান পয়েন্ট</label>
-        <input type="number" id="current" class="form-control" placeholder="যেমন: 500">
+    <div id="results" class="mt-4" style="text-align:left;">
+      <div class="alert alert-secondary">
+        <strong style="color:#a16207;">🟤 Bronze</strong> এ যেতে লাগবে <span id="bronzeResult">0</span> মাস
       </div>
-
-      <div class="mb-3">
-        <label for="perMonth" class="form-label">মাসে গড়ে কত পয়েন্ট পান</label>
-        <input type="number" id="perMonth" class="form-control" placeholder="যেমন: 200">
+      <div class="alert alert-light">
+        <strong style="color:#6b7280;">⚪ Silver</strong> এ যেতে লাগবে <span id="silverResult">0</span> মাস
       </div>
-
-      <button onclick="calculate()" class="btn btn-primary w-100">ক্যালকুলেট করুন</button>
-
-      <div id="result" class="mt-4"></div>
+      <div class="alert alert-warning">
+        <strong style="color:#ca8a04;">🟡 Gold</strong> এ যেতে লাগবে <span id="goldResult">0</span> মাস
+      </div>
+      <div class="alert alert-secondary">
+        <strong style="color:#9ca3af;">⚪ Platinum</strong> এ যেতে লাগবে <span id="platinumResult">0</span> মাস
+      </div>
+      <div class="alert alert-info">
+        <strong style="color:#06b6d4;">🔷 Diamond</strong> এ যেতে লাগবে <span id="diamondResult">0</span> মাস
+      </div>
     </div>
   </div>
 
+  <div class="footer">
+    Made With <span>♥️</span> by <strong>Saif Shiraj</strong>
+  </div>
+
   <script>
-    const levels = {
-      silver: 0,
-      gold: 300,
-      platinum: 600,
-      diamond: 3000
-    };
-
     function calculate() {
-      let current = parseInt(document.getElementById("current").value) || 0;
-      let perMonth = parseInt(document.getElementById("perMonth").value) || 0;
+      const current = parseInt(document.getElementById("currentPoints").value) || 0;
+      const perMonth = parseInt(document.getElementById("monthlyPoints").value) || 1;
 
-      let resultDiv = document.getElementById("result");
-      resultDiv.innerHTML = "";
+      // Thresholds
+      const bronze = 150;
+      const silver = 600;
+      const gold = 3000;
+      const platinum = 10000;
+      const diamond = 20000; // ধরে নিলাম Diamond সর্বশেষ লেভেল
 
-      if (perMonth <= 0) {
-        resultDiv.innerHTML = "<p class='text-danger'>❌ মাসে গড়ে কত পয়েন্ট পান সেটা লিখুন।</p>";
-        return;
-      }
+      // Bronze
+      document.getElementById("bronzeResult").innerText =
+        current < bronze ? Math.ceil((bronze - current) / perMonth) : 0;
 
-      for (let [level, points] of Object.entries(levels)) {
-        if (current < points) {
-          let needed = points - current;
-          let months = Math.ceil(needed / perMonth);
+      // Silver
+      document.getElementById("silverResult").innerText =
+        current < silver ? Math.ceil((silver - current) / perMonth) : 0;
 
-          let levelName = "";
-          let levelClass = "";
+      // Gold
+      document.getElementById("goldResult").innerText =
+        current < gold ? Math.ceil((gold - current) / perMonth) : 0;
 
-          if (level === "silver") { levelName = "Silver"; levelClass = "silver"; }
-          if (level === "gold") { levelName = "Gold"; levelClass = "gold"; }
-          if (level === "platinum") { levelName = "Platinum"; levelClass = "platinum"; }
-          if (level === "diamond") { levelName = "Diamond"; levelClass = "diamond"; }
+      // Platinum
+      document.getElementById("platinumResult").innerText =
+        current < platinum ? Math.ceil((platinum - current) / perMonth) : 0;
 
-          resultDiv.innerHTML += `
-            <div class="alert alert-dark mt-3">
-              <span class="level ${levelClass}">${levelName}</span> এ যেতে লাগবে <b>${months}</b> মাস
-            </div>
-          `;
-        }
-      }
+      // Diamond
+      document.getElementById("diamondResult").innerText =
+        current < diamond ? Math.ceil((diamond - current) / perMonth) : 0;
     }
   </script>
-  <footer style="position: fixed; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 14px; color: #ffffff;">
-  Made With ♥️ by <strong>Saif Shiraj</strong>
-</footer>
 </body>
 </html>
